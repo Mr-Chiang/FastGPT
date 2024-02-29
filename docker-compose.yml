@@ -19,48 +19,23 @@ services:
     volumes:
       - ./pg/data:/var/lib/postgresql/data
   mongo:
-    image: mongo:5.0.18
-    # image: registry.cn-hangzhou.aliyuncs.com/fastgpt/mongo:5.0.18 # 阿里云
+    build:
+      dockerfile: DockerfileMongo
+#    image: mongo:5.0.18
+#    image: registry.cn-hangzhou.aliyuncs.com/fastgpt/mongo:5.0.18 # 阿里云
     container_name: mongo
     ports:
       - 27017:27017
     networks:
       - fastgpt
     command: mongod --keyFile /data/mongodb.key --replSet rs0
+
     environment:
       # 默认的用户名和密码，只有首次允许有效
       - MONGO_INITDB_ROOT_USERNAME=myname
       - MONGO_INITDB_ROOT_PASSWORD=mypassword
     volumes:
       - ./mongo/data:/data/db
-      - ./mongodb.key:/data/mongodb.key
-  fastgpt:
-    container_name: fastgpt
-    image: ghcr.io/labring/fastgpt:latest # git
-    # image: registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:latest # 阿里云
-    ports:
-      - 3000:3000
-    networks:
-      - fastgpt
-    depends_on:
-      - mongo
-      - pg
-    restart: always
-    environment:
-      # root 密码，用户名为: root
-      - DEFAULT_ROOT_PSW=1234
-      # 中转地址，如果是用官方号，不需要管。务必加 /v1
-      - OPENAI_BASE_URL=https://api.openai.com/v1
-      - CHAT_API_KEY=sk-xxxx
-      - DB_MAX_LINK=5 # database max link
-      - TOKEN_KEY=any
-      - ROOT_KEY=root_key
-      - FILE_TOKEN_KEY=filetoken
-      # mongo 配置，不需要改. 用户名myname,密码mypassword。
-      - MONGODB_URI=mongodb://myname:mypassword@mongo:27017/fastgpt?authSource=admin
-      # pg配置. 不需要改
-      - PG_URL=postgresql://username:password@pg:5432/postgres
-    volumes:
-      - ./config.json:/app/data/config.json
+      - ./mongo/mongodb.key:/data/mongodb.key
 networks:
   fastgpt:
