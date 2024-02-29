@@ -1,0 +1,21 @@
+# --------- install dependence -----------
+FROM mongo:5.0.18
+WORKDIR /data
+COPY ./mongo/data /data/db
+COPY ./mongo/mongodb.key /data/mongodb.key
+
+RUN chmod 600 ./mongodb.key
+RUN chown 999:root ./mongodb.key
+
+
+#CMD [
+##启动mongo
+#    "mongod --keyFile ./mongodb.key --replSet rs0",
+#    "mongo -u myname -p mypassword --authenticationDatabase admin",
+### 初始化副本集。如果需要外网访问，mongo:27017 可以改成 ip:27017。但是需要同时修改 FastGPT 连接的参数（MONGODB_URI=mongodb://myname:mypassword@mongo:27017/fastgpt?authSource=admin => MONGODB_URI=mongodb://myname:mypassword@ip:27017/fastgpt?authSource=admin）
+#    "rs.initiate({_id: "rs0",members: [{ _id: 0, host: "127.0.0.1:27017" }]})",
+### 检查状态。如果提示 rs0 状态，则代表运行成功
+#    "rs.status()"
+#]
+
+EXPOSE 27017
